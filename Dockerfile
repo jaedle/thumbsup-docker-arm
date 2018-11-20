@@ -18,7 +18,7 @@ RUN npm install thumbsup@${PACKAGE_VERSION}
 # Runtime image
 # ------------------------------------------------
 
-FROM jaedle/thumbsup:runtime
+FROM jaedle/thumbsup-arm:runtime
 
 # Use tini as an init process
 # to ensure all child processes (ffmpeg...) are always terminated properly
