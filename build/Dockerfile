@@ -9,4 +9,4 @@ RUN apt-get update && apt-get install --yes \
 
 WORKDIR /app
 RUN npm init -y
-RUN npm install better-sqlite3
+RUN npm --verbose install better-sqlite3
