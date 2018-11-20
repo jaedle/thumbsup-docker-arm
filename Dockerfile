@@ -3,6 +3,7 @@
 # ------------------------------------------------
 
 FROM jaedle/thumbsup-arm:build as build
+COPY qemu-arm-static /usr/bin/
 
 # Install thumbsup locally
 WORKDIR /thumbsup
@@ -19,6 +20,7 @@ RUN npm install thumbsup@${PACKAGE_VERSION}
 # ------------------------------------------------
 
 FROM jaedle/thumbsup-arm:runtime
+COPY qemu-arm-static /usr/bin/
 
 # Use tini as an init process
 # to ensure all child processes (ffmpeg...) are always terminated properly
