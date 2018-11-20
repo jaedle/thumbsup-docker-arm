@@ -1,0 +1,20 @@
+language: minimal
+sudo: required
+addons:
+  apt:
+    packages:
+    - docker-ce
+install:
+- qemu_release_info=$(curl -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/multiarch/qemu-user-static/releases/latest)
+- qemu_url="$(echo $qemu_release_info | jq -r '.assets[] | select(.name == "qemu-arm-static")|
+  .browser_download_url')"
+- curl -sfL "$qemu_url" -o qemu-arm-static && chmod +x qemu-arm-static
+script:
+- docker container run --rm --privileged multiarch/qemu-user-static:register
+- docker build -t jaedle/thumbsup:runtime --build-arg target=arm --build-arg arch=arm
+  -f "runtime/Dockerfile" .
+- docker build -t jaedle/thumbsup:build --build-arg target=arm --build-arg arch=arm
+  -f "build/Dockerfile" .
+env:
+  global:
+    secure: SwlJAUzXBiFs6hI4guzNuUdLm8LIkypxI86F4Yn7RF4bTdHVSazBWPKsrcPUkpIgbWMD7OHv8RsPcADeIJiigEF+F6QUtRC+kLZjfaFJ37npriUBn3ZeKFRxXIIVQuRxyUbhuoFtmxgSiMVvNONmWo4/Jx7lEVeAs9nkOzu77qjK7ZDI4CBUC+SaRjy4xwOWrl5PnNjBJyyrvAoQKbltYX+Bp5wn1GlVEKyOULrjZe76ev6FxtHlI5mzVgX3ZPHKMT+KMFQHNVi0HDOwVX/x45IjLgqAf2HJLeA+C0hH4OL3tAQWU7jt4DBqTBh6msuyKVreZizO+DGVDgTAmFzlXgtpzeoBN0FNvyNCcVkEHkiwRNDaPIVeuV36lpOZ7pN5Iy68mV3enVCQmaEhMoI/DGtYYs8Zc5bsVz4ayn3orYik/ewXpLeN6AaC2wtyzJ1vTspa53VnQl1HA9uq6URr2E08FXU2U272JQAC/oUyO1cNTOlk7Od3oArUUsjfU3w9tdj67+ZTV+PAumQb92o7sRp+8ENw+Ez223DHCSWFpcIervzvETJuhQqqqbzRZkFOnNTEsg3yOerltqQ6oU6YOAlOL2am+mrQWInjbEC4ixjTLFrfZnpzJsSOfOnNPfoLQHnHHGllUpWbHjXtOiXM3gYDkrtRqRzPlK/TxbsU0I8=
