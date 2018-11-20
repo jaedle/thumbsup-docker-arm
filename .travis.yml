@@ -5,16 +5,29 @@ addons:
     packages:
     - docker-ce
 install:
+- thumbsup_release_info=$(curl -f -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/thumbsup/thumbsup/tags)
+- export THUMBSUP_VERSION="$(echo ${release_info} | jq -r '.[0].name' | sed 's/v//g')"
 - qemu_release_info=$(curl -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/multiarch/qemu-user-static/releases/latest)
 - qemu_url="$(echo $qemu_release_info | jq -r '.assets[] | select(.name == "qemu-arm-static")|
   .browser_download_url')"
 - curl -sfL "$qemu_url" -o qemu-arm-static && chmod +x qemu-arm-static
 script:
 - docker container run --rm --privileged multiarch/qemu-user-static:register
-- docker build -t jaedle/thumbsup:runtime --build-arg target=arm --build-arg arch=arm
+- docker image build -t jaedle/thumbsup-arm:runtime --build-arg target=arm --build-arg arch=arm
   -f "runtime/Dockerfile" .
-- docker build -t jaedle/thumbsup:build --build-arg target=arm --build-arg arch=arm
+- docker image build -t jaedle/thumbsup-arm:build --build-arg target=arm --build-arg arch=arm
   -f "build/Dockerfile" .
+- docker image build -t jaedle/thumbsup-arm:latest --build-arg target=arm --build-arg arch=arm
+  --build-arg PACKAGE_VERSION=${THUMBSUP_VERSION} -f "Dockerfile" .
+- docker image tag jaedle/thumbsup-arm:latest jaedle/thumbsup-arm:{THUMBSUP_VERSION}
+deploy:
+  provider: script
+  script: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && docker image push jaedle/thumbsup-arm:latest && docker push jaedle/thumbsup-arm:{THUMBSUP_VERSION}
+  on:
+    skip_cleanup: true
+    branch: master
 env:
   global:
-    secure: SwlJAUzXBiFs6hI4guzNuUdLm8LIkypxI86F4Yn7RF4bTdHVSazBWPKsrcPUkpIgbWMD7OHv8RsPcADeIJiigEF+F6QUtRC+kLZjfaFJ37npriUBn3ZeKFRxXIIVQuRxyUbhuoFtmxgSiMVvNONmWo4/Jx7lEVeAs9nkOzu77qjK7ZDI4CBUC+SaRjy4xwOWrl5PnNjBJyyrvAoQKbltYX+Bp5wn1GlVEKyOULrjZe76ev6FxtHlI5mzVgX3ZPHKMT+KMFQHNVi0HDOwVX/x45IjLgqAf2HJLeA+C0hH4OL3tAQWU7jt4DBqTBh6msuyKVreZizO+DGVDgTAmFzlXgtpzeoBN0FNvyNCcVkEHkiwRNDaPIVeuV36lpOZ7pN5Iy68mV3enVCQmaEhMoI/DGtYYs8Zc5bsVz4ayn3orYik/ewXpLeN6AaC2wtyzJ1vTspa53VnQl1HA9uq6URr2E08FXU2U272JQAC/oUyO1cNTOlk7Od3oArUUsjfU3w9tdj67+ZTV+PAumQb92o7sRp+8ENw+Ez223DHCSWFpcIervzvETJuhQqqqbzRZkFOnNTEsg3yOerltqQ6oU6YOAlOL2am+mrQWInjbEC4ixjTLFrfZnpzJsSOfOnNPfoLQHnHHGllUpWbHjXtOiXM3gYDkrtRqRzPlK/TxbsU0I8=
+  - secure: SwlJAUzXBiFs6hI4guzNuUdLm8LIkypxI86F4Yn7RF4bTdHVSazBWPKsrcPUkpIgbWMD7OHv8RsPcADeIJiigEF+F6QUtRC+kLZjfaFJ37npriUBn3ZeKFRxXIIVQuRxyUbhuoFtmxgSiMVvNONmWo4/Jx7lEVeAs9nkOzu77qjK7ZDI4CBUC+SaRjy4xwOWrl5PnNjBJyyrvAoQKbltYX+Bp5wn1GlVEKyOULrjZe76ev6FxtHlI5mzVgX3ZPHKMT+KMFQHNVi0HDOwVX/x45IjLgqAf2HJLeA+C0hH4OL3tAQWU7jt4DBqTBh6msuyKVreZizO+DGVDgTAmFzlXgtpzeoBN0FNvyNCcVkEHkiwRNDaPIVeuV36lpOZ7pN5Iy68mV3enVCQmaEhMoI/DGtYYs8Zc5bsVz4ayn3orYik/ewXpLeN6AaC2wtyzJ1vTspa53VnQl1HA9uq6URr2E08FXU2U272JQAC/oUyO1cNTOlk7Od3oArUUsjfU3w9tdj67+ZTV+PAumQb92o7sRp+8ENw+Ez223DHCSWFpcIervzvETJuhQqqqbzRZkFOnNTEsg3yOerltqQ6oU6YOAlOL2am+mrQWInjbEC4ixjTLFrfZnpzJsSOfOnNPfoLQHnHHGllUpWbHjXtOiXM3gYDkrtRqRzPlK/TxbsU0I8=
+  - secure: gzyIynyIvjHj6a77jimfX10u3Au+6Fu1SGmO3gIzHqiVX/ItoWaznNeLPGiQDUCFKSMgXQcFyG0PcBbf/vxGLca5TaWA8KcD5JxmYezHLX5Q8adUpN3uEYIS+9D7tvkKbTMsToEut+a780uI0b/kpPD7qZnCS3tes8UEiLMVd7ntca5QacW1T0VGJqLGqKMro/eIaZ2RcB8PZIeK8jI0xP7fHdMJH5/dOQKbZ8ZysS9U7EFmYdfL3i2k2m6WPKVro8BCff1O0LbsOtP6tEFkTd2H3r4TgWczjvYvlm/qIwWnkkRS6iUGEsO1IKyFTisIF5eptAbJQbKDGaX5UYIYUKjC2ajtbCeJb+x56a9NLIFClkq6KDw8Dpx5xbgfn+EuyQao4Olisw1+nRN2k+OsB47JQQU6cfyNZm/12oM01xyIFE7cE+pvC1CxXH2uA5Zu4qLlV32T6j6APirdo3SIHQqBJvjfyJGutI0MKsXYDvxrAwB/XXDGM7WtU3b2Ot8tdGSWRfYazue/0+3wweFaVtxT+2731lNVRQkFh6JTTCVdGW2S3/MwmZHx4FinvFBNhKfN0pvQCsG3fr2ZdtLvffC8dMJ0qMybcseP8qOwvSjNT9bwLKo4sH53m++khwEQVW39RwzCWFwdepYa8DY6gBWCEJ1fLh16noojTBdw7rI=
+  - secure: EOulVsgxJdcB+BfupWIC24w13KXyR9DH840GA7++52277cW8iplX5XfjQ8Q/ZDPj0TxDfkmgtLxkSCdeiiDmz1K8O5LyhBiepgMADUVO3bpwnIIpoTZKLZ2KLdL5OsGmX7dFNg8cNZOnfOAUEmStJ8HMt3G/p76vu8GSkCoP9O+eNcffgB7ViLqCX0S2MMs3qgMX9LPVksnaEDCiEp/oUwQn/2ur7pz8RxVnKhURJdxogd/4m3nD03kI2gktGTh5wtKRLsulqCGiNhUmUrIUfbT9c3U0/FLYQu+E197AHTN2Oze8C2ImkhiKfB9O2FU5VY6cenyyPS/GKLGGtNT1p8JoliT4ANua0QJoQBNywz5K85btUMjuYOTJ/l1+2T0J+9fwsxPOlx6BQTtUBQypaAxBV1GYZPUqO76OEcadmjuSdGSZJcNXpfOq71Ln19aA9bKoVz0OXOmrgp59svxa65qFXYy8h/oJcO6uwr2/Dx5aWTjmSa46UFqSY9oUmdbNM2VXm8mGRUC0OXLW3lp1bTGfXDQpaBQGUjKFmkqlVwPZQc5o/UjlOGzLGs2msPuvF/Kq9T4x1RYVMH4JCdLvhw6D/Eg29qiZlxPSLU73IA5jrMbuUo0SxH/mJfWCE0YGRFgjpycJQLTVt+A8KzKnBlRuEHNiP5fZBnFVbUtReyE=
