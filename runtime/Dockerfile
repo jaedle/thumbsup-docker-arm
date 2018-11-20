@@ -4,4 +4,5 @@ RUN apk add --no-cache \
     exiftool \
     ffmpeg \
     gifsicle \
-    graphicsmagick
+    graphicsmagick \
+    node
