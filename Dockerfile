@@ -22,10 +22,9 @@ RUN npm install thumbsup@${PACKAGE_VERSION}
 FROM jaedle/thumbsup-arm:runtime
 COPY qemu-arm-static /usr/bin/
 
-# Use tini as an init process
-# to ensure all child processes (ffmpeg...) are always terminated properly
-RUN apk add --update tini
-ENTRYPOINT ["tini", "-g", "--"]
+ADD https://github.com/krallin/tini/releases/v0.18.0/tini-armhf /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
 
 # Thumbsup can be run as any user and needs write-access to HOME
 ENV HOME /tmp

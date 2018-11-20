@@ -1,7 +1,11 @@
 FROM jaedle/thumbsup-arm:runtime
 COPY qemu-arm-static /usr/bin/
 
-RUN apk add --no-cache git make g++ python bash
+RUN apt-get update && apt-get install --yes \
+    git \
+    g++ \
+    make \
+    python
 
 WORKDIR /app
 RUN npm init -y
