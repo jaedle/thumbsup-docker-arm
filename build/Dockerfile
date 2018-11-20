@@ -5,7 +5,7 @@ RUN apk add --no-cache \
         ffmpeg \
         gifsicle \
         graphicsmagick \
-        node
+        nodejs
 
 RUN apk add --no-cache \
         git \
