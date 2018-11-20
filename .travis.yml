@@ -6,7 +6,7 @@ addons:
     - docker-ce
 install:
 - thumbsup_release_info=$(curl -f -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/thumbsup/thumbsup/tags)
-- export THUMBSUP_VERSION="$(echo $release_info | jq -r '.[0].name' | sed 's/v//g')"
+- export THUMBSUP_VERSION="$(echo $thumbsup_release_info | jq -r '.[0].name' | sed 's/v//g')"
 - qemu_release_info=$(curl -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/multiarch/qemu-user-static/releases/latest)
 - qemu_url="$(echo $qemu_release_info | jq -r '.assets[] | select(.name == "qemu-arm-static")|
   .browser_download_url')"
@@ -18,11 +18,11 @@ script:
 - docker image build -t jaedle/thumbsup-arm:build --build-arg target=arm --build-arg arch=arm
   -f "build/Dockerfile" .
 - docker image build -t jaedle/thumbsup-arm:latest --build-arg target=arm --build-arg arch=arm
-  --build-arg "PACKAGE_VERSION=2.4.1" -f "Dockerfile" .
-- docker image tag jaedle/thumbsup-arm:latest jaedle/thumbsup-arm:{THUMBSUP_VERSION}
+  --build-arg "PACKAGE_VERSION=$THUMBSUP_VERSION" -f "Dockerfile" .
+- docker image tag jaedle/thumbsup-arm:latest jaedle/thumbsup-arm:${THUMBSUP_VERSION}
 deploy:
   provider: script
-  script: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && docker image push jaedle/thumbsup-arm:latest && docker push jaedle/thumbsup-arm:{THUMBSUP_VERSION}
+  script: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && docker image push jaedle/thumbsup-arm:latest && docker push jaedle/thumbsup-arm:${THUMBSUP_VERSION}
   on:
     skip_cleanup: true
     branch: master
