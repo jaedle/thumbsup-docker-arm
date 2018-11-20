@@ -18,7 +18,7 @@ script:
 - docker image build -t jaedle/thumbsup-arm:build --build-arg target=arm --build-arg arch=arm
   -f "build/Dockerfile" .
 - docker image build -t jaedle/thumbsup-arm:latest --build-arg target=arm --build-arg arch=arm
-  --build-arg "PACKAGE_VERSION=${THUMBSUP_VERSION}" -f "Dockerfile" .
+  --build-arg "PACKAGE_VERSION=2.4.1" -f "Dockerfile" .
 - docker image tag jaedle/thumbsup-arm:latest jaedle/thumbsup-arm:{THUMBSUP_VERSION}
 deploy:
   provider: script
