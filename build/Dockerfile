@@ -1,4 +1,4 @@
-FROM jaedle/thumbsup:runtime
+FROM jaedle/thumbsup-arm:runtime
 RUN apk add --no-cache git make g++ python bash
 
 WORKDIR /app
