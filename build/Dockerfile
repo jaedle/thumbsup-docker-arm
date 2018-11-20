@@ -13,7 +13,3 @@ RUN apk add --no-cache \
         make \
         npm \
         python
-
-WORKDIR /app
-RUN npm init -y
-RUN npm --verbose install better-sqlite3
