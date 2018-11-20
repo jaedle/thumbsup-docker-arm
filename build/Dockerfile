@@ -1,17 +1,16 @@
-FROM arm32v7/node:10-stretch
-
+FROM arm32v6/alpine
 COPY qemu-arm-static /usr/bin/
-RUN apt-get update && apt-get install --yes \
-    exiftool \
-    ffmpeg \
-    gifsicle \
-    graphicsmagick
+RUN apk add --no-cache \
+        exiftool \
+        ffmpeg \
+        gifsicle \
+        graphicsmagick
 
-RUN apt-get update && apt-get install --yes \
-    git \
-    g++ \
-    make \
-    python
+RUN apk add --no-cache \
+        git \
+        g++ \
+        make \
+        python
 
 WORKDIR /app
 RUN npm init -y
