@@ -8,7 +8,8 @@ get_version:
   script:
     - thumbsup_release_info=$(curl -f -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/thumbsup/thumbsup/tags)
     - THUMBSUP_VERSION="$(echo $thumbsup_release_info | jq -r '.[0].name' | sed 's/v//g')"
-     - echo "$THUMBSUP_VERSION" > version/version 
+    - mkdir version/ 
+    - echo "$THUMBSUP_VERSION" > version/version 
   artifacts:
     paths:
       - version  
