@@ -1,4 +1,4 @@
-image: docker:stable-dind
+image: docker:stable
 
 before_script:
   - echo "Before script section"

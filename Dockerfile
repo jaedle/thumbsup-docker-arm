@@ -3,7 +3,6 @@
 # ------------------------------------------------
 
 FROM jaedle/thumbsup-arm:build as build
-COPY qemu-arm-static /usr/bin/
 
 # Install thumbsup locally
 WORKDIR /thumbsup
