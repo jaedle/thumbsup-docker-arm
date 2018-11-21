@@ -1,18 +1,30 @@
-image: docker:stable
+stages:
+  - get_version
+  - build_and_deploy
 
-before_script:
-  - echo "Before script section"
-  - echo "For example you might run an update here or install a build dependency"
-  - echo "Or perhaps you might print out some debugging details"
-   
-after_script:
-  - echo "After script section"
-  - echo "For example you might do some cleanup here"
-   
-build_runtime:
-  stage: build
+get_version:
+  image: jaedle/alpine-curl-jq-arm32v7:latest
+  stage: get_version
   script:
+    - thumbsup_release_info=$(curl -f -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/thumbsup/thumbsup/tags)
+    - THUMBSUP_VERSION="$(echo $thumbsup_release_info | jq -r '.[0].name' | sed 's/v//g')"
+     - echo "$THUMBSUP_VERSION" > version/version 
+  artifacts:
+    paths:
+      - version  
+  only:
+    - master
+
+build_and_deploy:
+  image: docker:stable
+  stage: build_and_deploy
+  script:
+    - ls -al version/
+    - cat version/version
     - docker image build -t jaedle/thumbsup-arm:runtime -f "runtime/Dockerfile" .
     - docker image build -t jaedle/thumbsup-arm:build -f "build/Dockerfile" .
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker image push jaedle/thumbsup-arm:runtime
+    - docker image push jaedle/thumbsup-arm:build
+  only:
+    - master

@@ -5,10 +5,10 @@ addons:
     packages:
     - docker-ce
 install:
-- thumbsup_release_info=$(curl -f -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/thumbsup/thumbsup/tags)
-- export THUMBSUP_VERSION="$(echo $thumbsup_release_info | jq -r '.[0].name' | sed 's/v//g')"
-- qemu_release_info=$(curl -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/multiarch/qemu-user-static/releases/latest)
-- qemu_url="$(echo $qemu_release_info | jq -r '.assets[] | select(.name == "qemu-arm-static")|
+thumbsup_release_info=$(curl -f -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/thumbsup/thumbsup/tags)
+export THUMBSUP_VERSION="$(echo $thumbsup_release_info | jq -r '.[0].name' | sed 's/v//g')"
+qemu_release_info=$(curl -H "Authorization:token $GITHUB_TOKEN" https://api.github.com/repos/multiarch/qemu-user-static/releases/latest)
+qemu_url="$(echo $qemu_release_info | jq -r '.assets[] | select(.name == "qemu-arm-static")|
   .browser_download_url')"
 - curl -sfL "$qemu_url" -o qemu-arm-static && chmod +x qemu-arm-static
 script:
