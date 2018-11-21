@@ -12,7 +12,7 @@ after_script:
 build1:
   stage: build
   script:
-    - ls -al var/run/docker.sock
+    - ls -al /var/run/docker.sock
     - docker container run hello-world
    
 test1:
