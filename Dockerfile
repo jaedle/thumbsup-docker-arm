@@ -19,7 +19,6 @@ RUN npm install thumbsup@${PACKAGE_VERSION}
 # ------------------------------------------------
 
 FROM jaedle/thumbsup-arm:runtime
-COPY qemu-arm-static /usr/bin/
 
 ADD https://github.com/krallin/tini/releases/v0.18.0/tini-armhf /tini
 RUN chmod +x /tini
