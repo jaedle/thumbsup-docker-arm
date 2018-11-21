@@ -20,7 +20,7 @@ RUN npm install thumbsup@${PACKAGE_VERSION}
 
 FROM jaedle/thumbsup-arm:runtime
 
-ADD https://github.com/krallin/tini/releases/v0.18.0/tini-armhf /tini
+ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-armhf /tini
 RUN chmod +x /tini
 ENTRYPOINT ["/tini", "--"]
 
