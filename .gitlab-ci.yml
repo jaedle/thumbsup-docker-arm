@@ -9,25 +9,10 @@ after_script:
   - echo "After script section"
   - echo "For example you might do some cleanup here"
    
-build1:
+build_runtime:
   stage: build
   script:
-    - ls -al /var/run/docker.sock
-    - docker container run hello-world
-   
-test1:
-  stage: test
-  script: 
-    - echo "Do a test here"
-    - echo "For example run a test suite"
-   
-test2:
-  stage: test
-  script: 
-    - echo "Do another parallel test here"
-    - echo "For example run a lint test"
-   
-deploy1:
-  stage: deploy
-  script:
-    - echo "Do your deploy here"
+    - docker image build -t jaedle/thumbsup-arm:runtime -f "runtime/Dockerfile" .
+    - docker image build -t jaedle/thumbsup-arm:build -f "build/Dockerfile" .
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker image push jaedle/thumbsup-arm:runtime
