@@ -21,9 +21,9 @@ build_and_deploy:
   stage: build_and_deploy
   script:
     - thumbsup_version="$(cat version/version)"
-    - docker image build -t jaedle/thumbsup-arm:runtime -f "runtime/Dockerfile" .
-    - docker image build -t jaedle/thumbsup-arm:build -f "build/Dockerfile" .
-    - docker image build -t jaedle/thumbsup-arm:latest --build-arg "PACKAGE_VERSION=$thumbsup_version" .
+    - docker image build --no-cache -t jaedle/thumbsup-arm:runtime -f "runtime/Dockerfile" .
+    - docker image build --no-cache -t jaedle/thumbsup-arm:build -f "build/Dockerfile" .
+    - docker image build --no-cache -t jaedle/thumbsup-arm:latest --build-arg "PACKAGE_VERSION=$thumbsup_version" .
     - docker image tag jaedle/thumbsup-arm:latest jaedle/thumbsup-arm:${thumbsup_version}
 
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
