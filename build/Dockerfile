@@ -5,4 +5,4 @@ RUN apk add --no-cache \
         g++ \
         make \
         npm \
-        python
+        python3
